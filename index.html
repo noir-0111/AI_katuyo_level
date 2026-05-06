@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI活用レベル診断</title>
+<meta name="description" content="10の質問に答えるだけ！あなたのAI活用レベルを診断します。">
+<meta property="og:title" content="AI活用レベル診断">
+<meta property="og:description" content="10の質問に答えるだけ！あなたのAI活用レベルを診断します。">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --navy: #0f3460;
+  --navy-dark: #1a1a2e;
+  --accent: #e94560;
+  --accent-light: #ff6b81;
+  --green: #2e7d32;
+  --orange: #e65100;
+  --bg: #f5f6fa;
+  --card: #ffffff;
+  --text: #1a1a2e;
+  --text-sub: #666;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --radius: 16px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* ===== HERO ===== */
+.hero {
+  background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 60%, #1a3a6e 100%);
+  color: #fff;
+  text-align: center;
+  padding: 48px 24px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle at 30% 70%, rgba(233,69,96,0.15) 0%, transparent 50%),
+              radial-gradient(circle at 70% 30%, rgba(46,125,50,0.1) 0%, transparent 50%);
+  animation: float 20s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-20px, 10px); }
+}
+.hero-content { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+.hero h1 { font-size: 28px; font-weight: 900; margin-bottom: 8px; letter-spacing: 0.5px; }
+.hero p { font-size: 15px; opacity: 0.85; margin-bottom: 24px; }
+.hero .badge-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+.hero .badge {
+  background: rgba(255,255,255,0.15);
+  padding: 4px 14px; border-radius: 20px; font-size: 12px;
+  backdrop-filter: blur(4px);
+}
+
+.start-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent);
+  color: #fff; border: none; padding: 14px 40px;
+  border-radius: 50px; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all 0.3s;
+  font-family: inherit;
+  box-shadow: 0 4px 15px rgba(233,69,96,0.4);
+}
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(233,69,96,0.5); }
+.start-btn:active { transform: translateY(0); }
+
+/* ===== CONTAINER ===== */
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ===== PROGRESS ===== */
+.progress-section {
+  padding: 20px 0 0;
+  display: none;
+}
+.progress-bar-bg {
+  background: #e0e0e0;
+  border-radius: 10px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--navy), var(--accent));
+  border-radius: 10px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+.progress-text {
+  font-size: 13px;
+  color: var(--text-sub);
+  text-align: right;
+  font-weight: 500;
+}
+
+/* ===== QUESTION CARD ===== */
+.question-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  margin: 20px 0 40px;
+  box-shadow: var(--shadow);
+  display: none;
+  animation: slideIn 0.4s ease;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.question-number {
+  display: inline-block;
+  background: var(--navy);
+  color: #fff;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 36px;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.question-category {
+  display: inline-block;
+  background: #e8f0fe;
+  color: var(--navy);
+  padding: 2px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.question-text {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.options { display: flex; flex-direction: column; gap: 12px; }
+.option-btn {
+  display: flex; align-items: center; gap: 14px;
+  background: #f8f9ff;
+  border: 2px solid #e0e4f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  font-size: 15px;
+}
+.option-btn:hover {
+  border-color: var(--navy);
+  background: #e8f0fe;
+  transform: translateX(4px);
+}
+.option-btn.selected {
+  border-color: var(--navy);
+  background: var(--navy);
+  color: #fff;
+}
+.option-btn .score-badge {
+  flex-shrink: 0;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px;
+  background: #e0e4f0;
+  color: var(--navy);
+  transition: all 0.25s;
+}
+.option-btn.selected .score-badge {
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+}
+.option-btn .option-label { flex: 1; font-weight: 500; }
+
+/* ===== NAV BUTTONS ===== */
+.nav-buttons {
+  display: flex; gap: 12px; justify-content: space-between;
+  margin-top: 24px;
+}
+.nav-btn {
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: inherit;
+  border: none;
+}
+.nav-btn.prev {
+  background: #e0e4f0;
+  color: var(--navy);
+}
+.nav-btn.prev:hover { background: #d0d4e0; }
+.nav-btn.next {
+  background: var(--navy);
+  color: #fff;
+  margin-left: auto;
+}
+.nav-btn.next:hover { background: #1a3a6e; }
+.nav-btn.next:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+.nav-btn.submit {
+  background: var(--accent);
+  color: #fff;
+  margin-left: auto;
+  box-shadow: 0 4px 15px rgba(233,69,96,0.3);
+}
+.nav-btn.submit:hover { box-shadow: 0 6px 20px rgba(233,69,96,0.4); }
+
+/* ===== RESULT ===== */
+.result-section {
+  display: none;
+  padding: 0 0 60px;
+  animation: slideIn 0.5s ease;
+}
+.result-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  margin: 24px 0;
+}
+.result-header {
+  padding: 32px 28px;
+  text-align: center;
+  color: #fff;
+}
+.result-header.beginner { background: linear-gradient(135deg, #c62828, #e53935); }
+.result-header.intermediate { background: linear-gradient(135deg, #e65100, #ff8f00); }
+.result-header.advanced { background: linear-gradient(135deg, #2e7d32, #43a047); }
+
+.result-level {
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.9;
+  margin-bottom: 4px;
+}
+.result-title {
+  font-size: 26px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+.result-score {
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1;
+}
+.result-score span { font-size: 18px; font-weight: 500; opacity: 0.8; }
+
+.result-image-wrapper {
+  padding: 24px 28px 0;
+  text-align: center;
+}
+.result-image {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.result-body { padding: 24px 28px 32px; }
+.result-subtitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+.result-description {
+  font-size: 14px;
+  color: var(--text-sub);
+  margin-bottom: 20px;
+  line-height: 1.8;
+}
+
+.advice-box {
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.advice-box.beginner { background: #fff0f3; border: 1px solid #ffd0d9; }
+.advice-box.intermediate { background: #fff8e1; border: 1px solid #ffe082; }
+.advice-box.advanced { background: #e8f5e9; border: 1px solid #a5d6a7; }
+.advice-box h4 {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.advice-box.beginner h4 { color: #c62828; }
+.advice-box.intermediate h4 { color: #e65100; }
+.advice-box.advanced h4 { color: #2e7d32; }
+.advice-box p { font-size: 13px; color: #555; line-height: 1.8; }
+
+/* Score breakdown */
+.breakdown { margin-top: 20px; }
+.breakdown h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 12px;
+}
+.breakdown-item {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 10px;
+}
+.breakdown-label {
+  font-size: 12px;
+  color: var(--text-sub);
+  width: 80px;
+  flex-shrink: 0;
+  text-align: right;
+}
+.breakdown-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: #e8e8e8;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.breakdown-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s ease;
+}
+.breakdown-bar.beginner { background: #e53935; }
+.breakdown-bar.intermediate { background: #ff8f00; }
+.breakdown-bar.advanced { background: #43a047; }
+.breakdown-score {
+  font-size: 13px;
+  font-weight: 700;
+  width: 30px;
+  text-align: center;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;
+}
+.action-btn {
+  flex: 1; min-width: 140px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: inherit;
+  text-align: center;
+  border: none;
+  text-decoration: none;
+  display: inline-block;
+}
+.action-btn.retry {
+  background: #e0e4f0;
+  color: var(--navy);
+}
+.action-btn.retry:hover { background: #d0d4e0; }
+.action-btn.share {
+  background: var(--navy);
+  color: #fff;
+}
+.action-btn.share:hover { background: #1a3a6e; }
+
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center;
+  padding: 24px;
+  font-size: 12px;
+  color: #999;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  .hero h1 { font-size: 22px; }
+  .hero { padding: 36px 20px 32px; }
+  .question-card { padding: 24px 20px; }
+  .question-text { font-size: 16px; }
+  .result-title { font-size: 22px; }
+  .result-score { font-size: 40px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="hero" id="heroSection">
+  <div class="hero-content">
+    <div class="badge-row">
+      <span class="badge">10問 / 約2分</span>
+      <span class="badge">無料診断</span>
+    </div>
+    <h1>AI活用レベル診断</h1>
+    <p>10の質問に答えるだけで、あなたのAI活用レベルと<br>最適な次の一歩が分かります</p>
+    <button class="start-btn" onclick="startDiagnosis()">
+      診断をはじめる →
+    </button>
+  </div>
+</div>
+
+<!-- ===== PROGRESS ===== -->
+<div class="container">
+  <div class="progress-section" id="progressSection">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">1 / 10</div>
+  </div>
+
+  <!-- ===== QUESTIONS ===== -->
+  <div id="questionContainer"></div>
+
+  <!-- ===== RESULT ===== -->
+  <div class="result-section" id="resultSection"></div>
+</div>
+
+<div class="footer">
+  &copy; Creative Canvas ー AI活用レベル診断
+</div>
+
+<script>
+// ===== QUESTIONS DATA =====
+const questions = [
+  {
+    id: 1,
+    category: "経験",
+    text: "ChatGPTやClaudeなどのAIを使ったことがある",
+    options: [
+      { label: "はい、定期的に使っている", score: 3 },
+      { label: "数回試したことがある程度", score: 2 },
+      { label: "いいえ、使ったことがない", score: 1 }
+    ]
+  },
+  {
+    id: 2,
+    category: "体制",
+    text: "社内でAIに関するルールやガイドラインがある",
+    options: [
+      { label: "はい、明文化されている", score: 3 },
+      { label: "口頭レベルでは決めている", score: 2 },
+      { label: "いいえ、特にルールはない", score: 1 }
+    ]
+  },
+  {
+    id: 3,
+    category: "課題認識",
+    text: "AIで自動化したい業務が具体的にある",
+    options: [
+      { label: "はい、具体的にリストアップできる", score: 3 },
+      { label: "なんとなくイメージはある", score: 2 },
+      { label: "いいえ、まだ分からない", score: 1 }
+    ]
+  },
+  {
+    id: 4,
+    category: "活用頻度",
+    text: "月に1回以上AIツールを業務で使っている",
+    options: [
+      { label: "はい、ほぼ毎日使っている", score: 3 },
+      { label: "月に数回は使っている", score: 2 },
+      { label: "いいえ、業務では使っていない", score: 1 }
+    ]
+  },
+  {
+    id: 5,
+    category: "実践度",
+    text: "AIの出力を社外向け（提案書・メール等）に使ったことがある",
+    options: [
+      { label: "はい、日常的に活用している", score: 3 },
+      { label: "一部で試したことがある", score: 2 },
+      { label: "いいえ、まだ使っていない", score: 1 }
+    ]
+  },
+  {
+    id: 6,
+    category: "DX基盤",
+    text: "自社の業務フローを文書化・整理できている",
+    options: [
+      { label: "はい、マニュアル等で整理されている", score: 3 },
+      { label: "一部の業務は整理している", score: 2 },
+      { label: "いいえ、属人化している", score: 1 }
+    ]
+  },
+  {
+    id: 7,
+    category: "学習意欲",
+    text: "AIに関する情報を定期的にキャッチアップしている",
+    options: [
+      { label: "はい、ニュースやSNSで追っている", score: 3 },
+      { label: "たまに目にする程度", score: 2 },
+      { label: "いいえ、ほとんど追っていない", score: 1 }
+    ]
+  },
+  {
+    id: 8,
+    category: "組織展開",
+    text: "社員にAIの使い方を教えたことがある",
+    options: [
+      { label: "はい、研修や勉強会を実施した", score: 3 },
+      { label: "個別に教えたことはある", score: 2 },
+      { label: "いいえ、まだ教えていない", score: 1 }
+    ]
+  },
+  {
+    id: 9,
+    category: "応用力",
+    text: "外部ツール同士を連携させた経験がある（例：Gmail × カレンダー × AI等）",
+    options: [
+      { label: "はい、複数のツールを連携させている", score: 3 },
+      { label: "一部で試したことがある", score: 2 },
+      { label: "いいえ、連携させたことがない", score: 1 }
+    ]
+  },
+  {
+    id: 10,
+    category: "成果",
+    text: "AI活用で具体的な成果（時間短縮・コスト削減等）を出したことがある",
+    options: [
+      { label: "はい、数字で効果を実感している", score: 3 },
+      { label: "なんとなく楽になった気はする", score: 2 },
+      { label: "いいえ、まだ成果は出ていない", score: 1 }
+    ]
+  }
+];
+
+// ===== RESULT DEFINITIONS =====
+// 画像パスをここで設定。ChatGPTで作成した画像を images/ フォルダに配置してください
+const results = {
+  beginner: {
+    level: "AI初心者",
+    title: "AI初心者レベル",
+    scoreRange: "10〜16点",
+    image: "images/result-beginner.png",
+    description: "AIの可能性は感じているものの、具体的な活用イメージがまだ湧いていない段階です。ここからがスタートラインです！",
+    advice: "まずは1つの業務だけでいいので、AIに触れる習慣を作ることが最優先です。「完璧に使いこなす」より「まず使ってみる」ことが大切。3ヶ月後には見える景色がガラッと変わります。最初の一歩はプロに相談しながら進めると、迷子にならずに済みます。",
+    futureAdvice: "まずはGoogleのGeminiから始めてみましょう。普段お使いのGmail・カレンダー・スプレッドシートにAIが組み込まれているので、新しいツールを覚える必要がありません。小さな成功体験を積み重ねることが、AI活用の第一歩です。"
+  },
+  intermediate: {
+    level: "AI中級者",
+    title: "AI中級者レベル",
+    scoreRange: "17〜23点",
+    image: "images/result-intermediate.png",
+    description: "個人ではAIを使い始めていますが、組織としての活用や仕組み化にはまだ至っていない段階です。次のステップが見えています！",
+    advice: "次のステップは「自分だけが使える」から「社内の仕組みにする」への移行です。業務フローの中にAIを組み込むことで、属人化を防ぎつつ全体の生産性を上げられます。社員への展開を見据えた設計がカギです。",
+    futureAdvice: "Google Geminiに加えて、Claudeも試してみてください。できることの幅がグッと広がります。特に資料作成やデータ分析など、複雑な業務ほどAIの効果を実感できるはずです。社員と一緒にAIを学ぶ仕組みを作ると、組織全体の生産性が一気に上がります。"
+  },
+  advanced: {
+    level: "AI上級者",
+    title: "AI上級者レベル",
+    scoreRange: "24〜30点",
+    image: "images/result-advanced.png",
+    description: "AIを実務に取り入れ、一定の成果も出ています。次は全社展開や新しい活用領域への拡大フェーズです！",
+    advice: "ここからは「効率化」だけでなく「AI × 売上拡大」の視点が重要です。データ分析、顧客対応の自動化、新規事業のプロトタイプなど「攻め」の活用へ。部門横断でAI活用を推進し、経営レベルでのインパクトを出すフェーズです。",
+    futureAdvice: "Claude・ChatGPT・Geminiを業務内容に応じて使い分け、さらにAPI連携や自動化ワークフローの構築にも挑戦してみましょう。AIを「ツール」から「インフラ」に昇華させることで、競合との差を決定的なものにできます。"
+  }
+};
+
+// ===== STATE =====
+let currentQuestion = 0;
+let answers = new Array(questions.length).fill(null);
+
+// ===== FUNCTIONS =====
+function startDiagnosis() {
+  document.getElementById('heroSection').style.display = 'none';
+  document.getElementById('progressSection').style.display = 'block';
+  showQuestion(0);
+}
+
+function showQuestion(index) {
+  currentQuestion = index;
+  const q = questions[index];
+  const container = document.getElementById('questionContainer');
+
+  const isLast = index === questions.length - 1;
+  const isFirst = index === 0;
+
+  container.innerHTML = `
+    <div class="question-card" style="display:block;">
+      <div>
+        <span class="question-number">${q.id}</span>
+        <span class="question-category">${q.category}</span>
+      </div>
+      <p class="question-text">${q.text}</p>
+      <div class="options">
+        ${q.options.map((opt, i) => `
+          <button class="option-btn ${answers[index] === i ? 'selected' : ''}"
+                  onclick="selectOption(${index}, ${i}, ${opt.score})">
+            <span class="score-badge">${i + 1}</span>
+            <span class="option-label">${opt.label}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div class="nav-buttons">
+        ${!isFirst ? '<button class="nav-btn prev" onclick="prevQuestion()">← 戻る</button>' : '<div></div>'}
+        ${isLast
+          ? `<button class="nav-btn submit" onclick="showResult()" ${answers[index] === null ? 'disabled' : ''}>診断結果を見る</button>`
+          : `<button class="nav-btn next" onclick="nextQuestion()" ${answers[index] === null ? 'disabled' : ''}>次へ →</button>`
+        }
+      </div>
+    </div>
+  `;
+
+  // Update progress
+  const progress = ((index + 1) / questions.length) * 100;
+  document.getElementById('progressBar').style.width = progress + '%';
+  document.getElementById('progressText').textContent = `${index + 1} / ${questions.length}`;
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function selectOption(questionIndex, optionIndex, score) {
+  answers[questionIndex] = optionIndex;
+  // Re-render to update selected state and enable buttons
+  showQuestion(questionIndex);
+}
+
+function nextQuestion() {
+  if (currentQuestion < questions.length - 1) {
+    showQuestion(currentQuestion + 1);
+  }
+}
+
+function prevQuestion() {
+  if (currentQuestion > 0) {
+    showQuestion(currentQuestion - 1);
+  }
+}
+
+function calculateScore() {
+  let total = 0;
+  answers.forEach((answerIndex, qIndex) => {
+    if (answerIndex !== null) {
+      total += questions[qIndex].options[answerIndex].score;
+    }
+  });
+  return total;
+}
+
+function getLevel(score) {
+  if (score <= 16) return 'beginner';
+  if (score <= 23) return 'intermediate';
+  return 'advanced';
+}
+
+function showResult() {
+  const score = calculateScore();
+  const level = getLevel(score);
+  const result = results[level];
+
+  // Hide question
+  document.getElementById('questionContainer').innerHTML = '';
+  document.getElementById('progressSection').style.display = 'none';
+
+  // Build score breakdown per category
+  const categories = questions.map((q, i) => ({
+    category: q.category,
+    score: answers[i] !== null ? q.options[answers[i]].score : 0,
+    maxScore: 3
+  }));
+
+  const breakdownHTML = categories.map(c => `
+    <div class="breakdown-item">
+      <span class="breakdown-label">${c.category}</span>
+      <div class="breakdown-bar-bg">
+        <div class="breakdown-bar ${level}" style="width: ${(c.score / c.maxScore) * 100}%"></div>
+      </div>
+      <span class="breakdown-score">${c.score}/3</span>
+    </div>
+  `).join('');
+
+  const resultSection = document.getElementById('resultSection');
+  resultSection.style.display = 'block';
+  resultSection.innerHTML = `
+    <div class="result-card">
+      <div class="result-header ${level}">
+        <div class="result-level">${result.scoreRange}</div>
+        <div class="result-title">${result.title}</div>
+        <div class="result-score">${score}<span> / 30点</span></div>
+      </div>
+
+      <div class="result-image-wrapper">
+        <img class="result-image"
+             src="${result.image}"
+             alt="${result.title}"
+             onerror="this.parentElement.innerHTML='<div style=\\'background:#f0f0f0;border-radius:12px;padding:40px 20px;text-align:center;color:#999;font-size:13px;\\'>画像準備中<br><br><strong>${result.title}</strong><br><br>images/ フォルダに<br>result-${level}.png を配置してください</div>'"
+        >
+      </div>
+
+      <div class="result-body">
+        <p class="result-subtitle">あなたの現在地</p>
+        <p class="result-description">${result.description}</p>
+
+        <div class="advice-box ${level}">
+          <h4>今のあなたへのアドバイス</h4>
+          <p>${result.advice}</p>
+        </div>
+
+        <div class="advice-box ${level}">
+          <h4>今後に向けて</h4>
+          <p>${result.futureAdvice}</p>
+        </div>
+
+        <div class="breakdown">
+          <h4>カテゴリ別スコア</h4>
+          ${breakdownHTML}
+        </div>
+
+        <div class="action-buttons">
+          <button class="action-btn retry" onclick="retry()">もう一度診断する</button>
+          <button class="action-btn share" onclick="shareResult(${score}, '${result.title}')">結果をシェア</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Animate breakdown bars
+  setTimeout(() => {
+    document.querySelectorAll('.breakdown-bar').forEach(bar => {
+      bar.style.width = bar.style.width; // trigger reflow
+    });
+  }, 100);
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function retry() {
+  answers = new Array(questions.length).fill(null);
+  currentQuestion = 0;
+  document.getElementById('resultSection').style.display = 'none';
+  document.getElementById('resultSection').innerHTML = '';
+  document.getElementById('heroSection').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function shareResult(score, title) {
+  const text = `AI活用レベル診断の結果は「${title}」（${score}/30点）でした！\n\n10の質問に答えるだけであなたのAI活用レベルが分かります。`;
+  if (navigator.share) {
+    navigator.share({ title: 'AI活用レベル診断', text: text, url: window.location.href });
+  } else {
+    navigator.clipboard.writeText(text + '\n' + window.location.href).then(() => {
+      alert('結果をクリップボードにコピーしました！');
+    });
+  }
+}
+
+</script>
+
+</body>
+</html>
